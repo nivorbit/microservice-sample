@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: api-gateway
+  zipkin:
+    base-url: http://jaeger:9411
+
+  cloud:
+    gateway:
+      routes:
+        - id: customer-service
+          uri: ${CUSTOMER_SERVICE_URL:http://customer-service:8080}
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - RewritePath=/api(?<path>/?.*), $\{path}
+        - id: fraud-service
+          uri: ${FRAUD_SERVICE_URL:http://fraud-service:8080}
+          predicates:
+            - Path=/api/frauds/**
+          filters:
+            - RewritePath=/api/frauds(?<path>/?.*), $\{path}
+
+    loadbalancer:
+      ribbon:
+        enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${oauth2.client.keycloak.jwk-set-uri}
+          issuer-uri: ${oauth2.client.keycloak.issuer-uri}
+
+  profiles:
+    active: keycloak
+
+client:
+  id: ${OAUTH_CLIENT_ID:nivorbit-app}
+  secret: ${OAUTH_CLIENT_SECRET:PJy030IkgZs7agVxxGcDE88WcCCNqyge}
+  issuer-uri: http://host.docker.internal:8888/realms/nivorbit
+  audience: nivorbit-gateway
+
+oauth2.client:
+  keycloak:
+    client-id: ${client.id}
+    client-secret: ${client.secret}
+    issuer-uri: ${client.issuer-uri}
+    jwk-set-uri: ${client.issuer-uri}/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    gateway:
+      routes:
+        - id: customer-service
+          uri: ${CUSTOMER_SERVICE_URL:http://localhost:9001}
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - RewritePath=/api(?<path>/?.*), $\{path}
+        - id: fraud-service
+          uri: ${FRAUD_SERVICE_URL:http://localhost:9002}
+          predicates:
+            - Path=/api/frauds/**
+          filters:
+            - RewritePath=/api/frauds(?<path>/?.*), $\{path}
+
+server:
+  port: 9000
+
+client:
+  issuer-uri: http://host.docker.internal:8888/realms/nivorbit

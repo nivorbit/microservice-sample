@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: customer-service
+  zipkin:
+    base-url: http://jaeger:9411
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://host.docker.internal:8888/realms/nivorbit/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 9001
