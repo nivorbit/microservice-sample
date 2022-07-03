@@ -7,7 +7,6 @@ ENV KC_METRICS_ENABLED=true
 
 # Install custom providers
 COPY ${JAR_FILE} /opt/keycloak/providers/external-user-storage.jar
-RUN curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/2.5.3/keycloak-metrics-spi-2.5.3.jar -o /opt/keycloak/providers/keycloak-metrics-spi-2.5.3.jar
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:latest

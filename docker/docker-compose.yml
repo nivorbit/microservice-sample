@@ -1,64 +1,6 @@
 version: '3.9'
 
 services:
-  elasticsearch:
-    container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.4
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:7.17.4
-    environment:
-      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-  logstash:
-    container_name: logstash
-    image: docker.elastic.co/logstash/logstash:7.17.4
-    ports:
-      - "4560:4560"
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  grafana:
-    container_name: grafana
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - metrics:/var/lib/grafana
-  jaeger:
-    container_name: jaeger
-    image: jaegertracing/all-in-one:1.35
-    ports:
-      - "6831:6831"
-      - "6832:6832"
-      - "5778:5778"
-      - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
-      - "14250:14250"
-      - "14268:14268"
-      - "14269:14269"
-      - "9411:9411"
-    environment:
-      COLLECTOR_OTLP_ENABLED: true
-      COLLECTOR_ZIPKIN_HOST_PORT: 9411
-
   auth-server:
     container_name: auth-server
     image: nivorbit/services/keycloak-server:1.0.0
@@ -69,23 +11,35 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=change_me
     volumes:
       - auth:/opt/keycloak/data
+    networks:
+      - services_network
   customer-service:
     container_name: customer-service
     image: nivorbit/services/customer-service
     ports:
       - "8081:8080"
+    networks:
+      - services_network
   fraud-service:
     container_name: fraud-service
     image: nivorbit/services/fraud-service
     ports:
       - "8082:8080"
-  api-gateway:
-    container_name: api-gateway
-    image: nivorbit/services/api-gateway
-    ports:
-      - "8083:8080"
+    networks:
+      - services_network
+#  api-gateway:
+#    container_name: api-gateway
+#    image: nivorbit/services/api-gateway
+#    ports:
+#      - "8083:8080"
+#    networks:
+#      - services_network
+
+
+networks:
+  services_network:
+    name: nivorbit_services_nw
+    driver: bridge
 
 volumes:
-  elasticsearch:
-  metrics:
   auth:
