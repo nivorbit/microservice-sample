@@ -30,12 +30,13 @@ services:
       - apisix
 
   apisix:
-    image: nivorbit/services/apisix-gateway:1.0.0
+    image: apache/apisix:2.14.1-alpine
     hostname: apisix
     restart: always
     volumes:
       - ./apisix/logs:/usr/local/apisix/logs
       - ./apisix/apisix_conf.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ../apisix/plugins/nivorbit-openid-connect.lua:/usr/local/apisix/apisix/plugins/nivorbit-openid-connect.lua:ro
     depends_on:
       - etcd
     ports:

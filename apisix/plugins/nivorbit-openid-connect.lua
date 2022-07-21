@@ -255,7 +255,7 @@ local function exchange_token(ctx, conf, token)
             core.log.error(err)
             return token
         end
-        core.log.warn("token exchanged successfully. Successful token")
+        core.log.warn("token exchange succeed")
         core.log.warn(json.access_token)
         return json.access_token
     end
