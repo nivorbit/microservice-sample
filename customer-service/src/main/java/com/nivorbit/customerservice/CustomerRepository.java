@@ -5,18 +5,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 public class CustomerRepository {
 
   private final List<Customer> customers = new ArrayList<>();
 
-  public Optional<Customer> findById(UUID id) {
-    return customers.stream().filter(customer -> customer.getId().equals(id)).findFirst();
+  public Mono<Customer> findById(UUID id) {
+    return Mono.justOrEmpty(customers.stream().filter(customer -> customer.getId().equals(id)).findFirst());
   }
 
-  public List<Customer> findAll() {
-    return customers;
+  public Flux<Customer> findAll() {
+    return Flux.fromIterable(customers);
   }
 
   public void delete(UUID id) {

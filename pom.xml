@@ -17,5 +17,6 @@
     <module>customer-service</module>
     <module>fraud-service</module>
     <module>keycloak-user-storage-spi</module>
+    <module>auth-spring-boot-starter</module>
   </modules>
 </project>

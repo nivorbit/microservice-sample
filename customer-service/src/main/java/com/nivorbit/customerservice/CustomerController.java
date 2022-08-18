@@ -1,6 +1,5 @@
 package com.nivorbit.customerservice;
 
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -23,30 +24,32 @@ public class CustomerController {
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/{id}")
-  public Customer findById(@PathVariable UUID id) {
+  public Mono<Customer> findById(@PathVariable UUID id) {
     log.info("fetch customer {}", id);
-    return customerService.findById(id).orElse(null);
+    return customerService.findById(id);
   }
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping
-  public List<Customer> findAll() {
+  public Flux<Customer> findAll() {
     log.info("fetch all customers");
     return customerService.findAll();
   }
 
   @PreAuthorize("hasRole('USER')")
   @PostMapping
-  public void findById(@RequestBody Customer customer) {
+  public Mono<Void> create(@RequestBody Customer customer) {
     log.info("new customer registration {}", customer);
     customerService.add(customer);
+    return Mono.empty();
   }
 
   @PreAuthorize("hasRole('USER')")
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable UUID id) {
+  public Mono<Void> delete(@PathVariable UUID id) {
     log.info("delete customer {}", id);
     customerService.delete(id);
+    return Mono.empty();
   }
 
 }

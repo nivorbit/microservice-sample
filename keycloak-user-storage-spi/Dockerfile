@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:latest as builder
+FROM quay.io/keycloak/keycloak:18.0.2 as builder
 
 ARG JAR_FILE=target/*.jar
 
@@ -9,7 +9,7 @@ ENV KC_METRICS_ENABLED=true
 COPY ${JAR_FILE} /opt/keycloak/providers/external-user-storage.jar
 RUN /opt/keycloak/bin/kc.sh build
 
-FROM quay.io/keycloak/keycloak:latest
+FROM quay.io/keycloak/keycloak:18.0.2
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 WORKDIR /opt/keycloak
 # for demonstration purposes only, please make sure to use proper certificates in production instead
