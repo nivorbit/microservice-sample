@@ -1,4 +1,4 @@
-package com.nivorbit.customerservice;
+package com.nivorbit.auth.context;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,12 +6,12 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
-public final class ReactiveRequestContextHolder {
+public final class ReactiveAuthContextHolder {
   private static final ObjectMapper objectMapper = new ObjectMapper().configure(
       DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).findAndRegisterModules();
 
-  public static Mono<RequestContext> getContext() {
-    return jwt().map(jwt -> objectMapper.convertValue(jwt.getClaims(), RequestContext.class));
+  public static Mono<AuthContext> getContext() {
+    return jwt().map(jwt -> objectMapper.convertValue(jwt.getClaims(), AuthContext.class));
   }
 
   private static Mono<Jwt> jwt() {

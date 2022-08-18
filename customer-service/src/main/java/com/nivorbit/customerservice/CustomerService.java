@@ -1,5 +1,6 @@
 package com.nivorbit.customerservice;
 
+import com.nivorbit.auth.context.ReactiveAuthContextHolder;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ public class CustomerService {
   private final RestTemplate restTemplate;
 
   public Mono<Customer> findById(UUID id) {
-    return ReactiveRequestContextHolder.getContext().flatMap(requestContext -> {
+    return ReactiveAuthContextHolder.getContext().flatMap(requestContext -> {
       log.info("Customer Number: {}", requestContext.getCustomerNumber());
       log.info("Account No: {}", requestContext.getAccountNo());
       return customerRepository.findById(id);

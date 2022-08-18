@@ -1,8 +1,7 @@
-package com.nivorbit.auth.servlet.context;
+package com.nivorbit.auth.context;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nivorbit.auth.context.AuthContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
