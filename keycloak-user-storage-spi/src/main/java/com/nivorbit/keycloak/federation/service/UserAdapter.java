@@ -1,6 +1,6 @@
-package com.nivorbit.keycloak.storage.service;
+package com.nivorbit.keycloak.federation.service;
 
-import com.nivorbit.keycloak.storage.client.UserValidationResponse;
+import com.nivorbit.keycloak.federation.client.UserValidationResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;

@@ -1,6 +1,6 @@
-package com.nivorbit.keycloak.storage;
+package com.nivorbit.keycloak.federation;
 
-import com.nivorbit.keycloak.storage.provider.ExternalUserStorageProvider;
+import com.nivorbit.keycloak.federation.provider.ExternalUserFederationProvider;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.component.ComponentModel;
@@ -13,8 +13,8 @@ import org.keycloak.storage.UserStorageProviderFactory;
 import org.keycloak.utils.StringUtil;
 
 @Slf4j
-public class ExternalUserStorageProviderFactory
-    implements UserStorageProviderFactory<ExternalUserStorageProvider> {
+public class ExternalUserFederationProviderFactory
+    implements UserStorageProviderFactory<ExternalUserFederationProvider> {
 
   private static final List<ProviderConfigProperty> configMetadata;
 
@@ -29,14 +29,14 @@ public class ExternalUserStorageProviderFactory
   }
 
   @Override
-  public ExternalUserStorageProvider create(
+  public ExternalUserFederationProvider create(
       KeycloakSession keycloakSession, ComponentModel componentModel) {
-    return new ExternalUserStorageProvider(keycloakSession, componentModel);
+    return new ExternalUserFederationProvider(keycloakSession, componentModel);
   }
 
   @Override
   public String getId() {
-    return "external-user-provider";
+    return "external-user-federation";
   }
 
   @Override

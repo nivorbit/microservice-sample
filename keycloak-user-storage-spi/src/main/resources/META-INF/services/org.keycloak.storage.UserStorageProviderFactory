@@ -1,1 +1,1 @@
-com.nivorbit.keycloak.storage.ExternalUserStorageProviderFactory
+com.nivorbit.keycloak.federation.ExternalUserFederationProviderFactory

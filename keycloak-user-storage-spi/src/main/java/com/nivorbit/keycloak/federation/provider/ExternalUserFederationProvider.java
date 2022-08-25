@@ -1,11 +1,11 @@
-package com.nivorbit.keycloak.storage.provider;
+package com.nivorbit.keycloak.federation.provider;
 
-import com.nivorbit.keycloak.storage.client.UserValidationClient;
-import com.nivorbit.keycloak.storage.client.UserValidationRequest;
-import com.nivorbit.keycloak.storage.client.UserValidationResponse;
-import com.nivorbit.keycloak.storage.service.PasswordVerify;
-import com.nivorbit.keycloak.storage.service.UserAdapter;
-import com.nivorbit.keycloak.storage.service.UserService;
+import com.nivorbit.keycloak.federation.client.UserValidationClient;
+import com.nivorbit.keycloak.federation.client.UserValidationRequest;
+import com.nivorbit.keycloak.federation.client.UserValidationResponse;
+import com.nivorbit.keycloak.federation.service.PasswordVerify;
+import com.nivorbit.keycloak.federation.service.UserAdapter;
+import com.nivorbit.keycloak.federation.service.UserService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import org.keycloak.storage.user.UserLookupProvider;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ExternalUserStorageProvider
+public class ExternalUserFederationProvider
     implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
 
   private final KeycloakSession session;
@@ -31,7 +31,7 @@ public class ExternalUserStorageProvider
   private final UserService userService;
   private final PasswordVerify passwordVerify;
 
-  public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
+  public ExternalUserFederationProvider(KeycloakSession session, ComponentModel model) {
     this(session, model, new UserService(new UserValidationClient(session, model)),
         new PasswordVerify());
   }

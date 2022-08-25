@@ -1,4 +1,4 @@
-package com.nivorbit.keycloak.storage.service;
+package com.nivorbit.keycloak.federation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

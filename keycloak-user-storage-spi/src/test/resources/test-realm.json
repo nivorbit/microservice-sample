@@ -1537,8 +1537,8 @@
     "org.keycloak.storage.UserStorageProvider": [
       {
         "id": "6d730ffe-2875-449d-b4c8-f8242cc37b6b",
-        "name": "external-user-provider",
-        "providerId": "external-user-provider",
+        "name": "external-user-federation",
+        "providerId": "external-user-federation",
         "subComponents": {},
         "config": {
           "url": [

@@ -1,4 +1,4 @@
-package com.nivorbit.keycloak.storage.provider;
+package com.nivorbit.keycloak.federation.provider;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -8,23 +8,43 @@ import static org.hamcrest.Matchers.containsString;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Disabled
 @Slf4j
 @Testcontainers
-class ExternalUserStorageProviderIT {
+class ExternalUserFederationProviderIT {
 
   private static final String REALM = "test";
 
+  private static Network network = Network.newNetwork();
   @Container
   private static final KeycloakContainer keycloak =
       new KeycloakContainer("quay.io/keycloak/keycloak:19.0.1")
           .withRealmImportFile("/test-realm.json")
           .withProviderClassesFrom("target/classes");
+
+  @Container
+  private static final GenericContainer<?> apiMock = new GenericContainer<>("muonsoft/openapi-mock:latest")
+      .withExposedPorts(8080)
+      .withClasspathResourceMapping("api.yaml", "/tmp/spec.yaml", BindMode.READ_ONLY)
+      .withEnv(Map.of(
+          "OPENAPI_MOCK_SPECIFICATION_URL", "/tmp/spec.yaml",
+          "OPENAPI_MOCK_USE_EXAMPLES", "if_present"
+      ))
+      .withLogConsumer(new Slf4jLogConsumer(log))
+      .withNetwork(network)
+      .withNetworkAliases("api");
+
 
   @ParameterizedTest
   @ValueSource(strings = {KeycloakContainer.MASTER_REALM, REALM})

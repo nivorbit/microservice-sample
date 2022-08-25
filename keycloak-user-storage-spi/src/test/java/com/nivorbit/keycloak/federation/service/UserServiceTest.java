@@ -1,13 +1,12 @@
-package com.nivorbit.keycloak.storage.service;
+package com.nivorbit.keycloak.federation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.nivorbit.keycloak.storage.client.UserValidationClient;
-import com.nivorbit.keycloak.storage.client.UserValidationResponse;
+import com.nivorbit.keycloak.federation.client.UserValidationClient;
+import com.nivorbit.keycloak.federation.client.UserValidationResponse;
 import java.io.IOException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

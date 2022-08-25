@@ -1,8 +1,8 @@
-package com.nivorbit.keycloak.storage.service;
+package com.nivorbit.keycloak.federation.service;
 
-import com.nivorbit.keycloak.storage.client.UserValidationClient;
-import com.nivorbit.keycloak.storage.client.UserValidationRequest;
-import com.nivorbit.keycloak.storage.client.UserValidationResponse;
+import com.nivorbit.keycloak.federation.client.UserValidationClient;
+import com.nivorbit.keycloak.federation.client.UserValidationRequest;
+import com.nivorbit.keycloak.federation.client.UserValidationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

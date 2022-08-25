@@ -1,20 +1,20 @@
-package com.nivorbit.keycloak.storage;
+package com.nivorbit.keycloak.federation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.nivorbit.keycloak.storage.provider.ExternalUserStorageProvider;
+import com.nivorbit.keycloak.federation.provider.ExternalUserFederationProvider;
 import org.junit.jupiter.api.Test;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 
-class ExternalUserStorageProviderFactoryTest {
+class ExternalUserFederationProviderFactoryTest {
 
   @Test
   void testCreate() {
-    ExternalUserStorageProviderFactory factory =
-        new ExternalUserStorageProviderFactory();
+    ExternalUserFederationProviderFactory factory =
+        new ExternalUserFederationProviderFactory();
     assertThat(factory).isNotNull();
 
     var componentModel = mock(ComponentModel.class);
@@ -23,15 +23,15 @@ class ExternalUserStorageProviderFactoryTest {
 
     when(componentModel.get("url")).thenReturn("http://localhost:6666");
 
-    ExternalUserStorageProvider externalUserStorageProvider =
+    ExternalUserFederationProvider externalUserFederationProvider =
         factory.create(mock(KeycloakSession.class), componentModel);
-    assertThat(externalUserStorageProvider).isNotNull();
+    assertThat(externalUserFederationProvider).isNotNull();
   }
 
   @Test
   void testProviderId() {
-    ExternalUserStorageProviderFactory factory =
-        new ExternalUserStorageProviderFactory();
+    ExternalUserFederationProviderFactory factory =
+        new ExternalUserFederationProviderFactory();
     assertThat(factory).isNotNull();
     assertThat(factory.getId()).isEqualTo("external-user-provider");
   }

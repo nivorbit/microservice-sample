@@ -1,4 +1,4 @@
-package com.nivorbit.keycloak.storage.service;
+package com.nivorbit.keycloak.federation.service;
 
 public class PasswordVerify {
   public boolean verify(String password) {

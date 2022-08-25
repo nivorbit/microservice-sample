@@ -1,4 +1,4 @@
-package com.nivorbit.keycloak.storage.client;
+package com.nivorbit.keycloak.federation.client;
 
 import java.io.IOException;
 import javax.ws.rs.WebApplicationException;
