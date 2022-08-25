@@ -1,4 +1,4 @@
-package com.nivorbit.keycloak.storage.model;
+package com.nivorbit.keycloak.storage.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class UserValidationRequest {
   private String username;
   private String password;
+  private String sessionId;
+  private String customerId;
+  private boolean corporate;
 }

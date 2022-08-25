@@ -3,7 +3,7 @@ package com.nivorbit.keycloak.storage.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.nivorbit.keycloak.storage.model.User;
+import com.nivorbit.keycloak.storage.client.UserValidationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.keycloak.component.ComponentModel;
@@ -20,9 +20,9 @@ class UserAdapterTest {
             mock(KeycloakSession.class),
             mock(RealmModel.class),
             mock(ComponentModel.class),
-            new User("user", "password"));
+            UserValidationResponse.builder().username("username").build());
 
     assertThat(userAdapter).isNotNull();
-    assertThat(userAdapter.getUsername()).isEqualTo("user");
+    assertThat(userAdapter.getUsername()).isEqualTo("username");
   }
 }

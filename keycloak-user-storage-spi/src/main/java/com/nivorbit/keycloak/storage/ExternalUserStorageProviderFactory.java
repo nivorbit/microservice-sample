@@ -1,29 +1,54 @@
 package com.nivorbit.keycloak.storage;
 
 import com.nivorbit.keycloak.storage.provider.ExternalUserStorageProvider;
-import com.nivorbit.keycloak.storage.service.PasswordVerify;
-import com.nivorbit.keycloak.storage.service.UserService;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.component.ComponentModel;
+import org.keycloak.component.ComponentValidationException;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
+import org.keycloak.utils.StringUtil;
 
+@Slf4j
 public class ExternalUserStorageProviderFactory
     implements UserStorageProviderFactory<ExternalUserStorageProvider> {
 
-  public static final String PROVIDER_NAME = "external-user-storage";
+  private static final List<ProviderConfigProperty> configMetadata;
 
-  private final UserService userService = new UserService();
-  private final PasswordVerify passwordVerify = new PasswordVerify();
+  static {
+    configMetadata = ProviderConfigurationBuilder.create()
+        .property().name("url")
+        .type(ProviderConfigProperty.STRING_TYPE)
+        .label("URL")
+        .defaultValue("")
+        .helpText("Url path to api")
+        .add().build();
+  }
 
   @Override
   public ExternalUserStorageProvider create(
       KeycloakSession keycloakSession, ComponentModel componentModel) {
-    return new ExternalUserStorageProvider(
-        keycloakSession, componentModel, this.userService, this.passwordVerify);
+    return new ExternalUserStorageProvider(keycloakSession, componentModel);
   }
 
   @Override
   public String getId() {
-    return PROVIDER_NAME;
+    return "external-user-provider";
+  }
+
+  @Override
+  public List<ProviderConfigProperty> getConfigProperties() {
+    return configMetadata;
+  }
+
+  @Override
+  public void validateConfiguration(KeycloakSession session, RealmModel realm,
+                                    ComponentModel config) throws ComponentValidationException {
+    if (StringUtil.isBlank(config.get("url"))) {
+      throw new ComponentValidationException("Please provide url");
+    }
   }
 }

@@ -2,10 +2,11 @@ package com.nivorbit.keycloak.storage.provider;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.nivorbit.keycloak.storage.model.User;
+import com.nivorbit.keycloak.storage.client.UserValidationResponse;
 import com.nivorbit.keycloak.storage.service.PasswordVerify;
 import com.nivorbit.keycloak.storage.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -57,25 +58,25 @@ class ExternalUserStorageProviderTest {
 
   @Test
   void shouldGetByUserId() {
-    when(userService.findByUsername("user")).thenReturn(new User("user", "password"));
-    UserModel userModel = externalUserStorageProvider.getUserById( "user", mock(RealmModel.class));
+    when(userService.findByUsername(any())).thenReturn(UserValidationResponse.builder().username("username").build());
+    UserModel userModel = externalUserStorageProvider.getUserById( "username", mock(RealmModel.class));
     assertThat(userModel).isNotNull();
-    assertThat(userModel.getUsername()).isEqualTo("user");
+    assertThat(userModel.getUsername()).isEqualTo("username");
   }
 
   @Test
   void shouldGetByUsername() {
-    when(userService.findByUsername("user")).thenReturn(new User("user", "password"));
-    UserModel userModel = externalUserStorageProvider.getUserByUsername( "user", mock(RealmModel.class));
+    when(userService.findByUsername(any())).thenReturn(UserValidationResponse.builder().username("username").build());
+    UserModel userModel = externalUserStorageProvider.getUserByUsername( "username", mock(RealmModel.class));
     assertThat(userModel).isNotNull();
-    assertThat(userModel.getUsername()).isEqualTo("user");
+    assertThat(userModel.getUsername()).isEqualTo("username");
   }
 
   @Test
   void shouldGetByEmail() {
-    when(userService.findByUsername("user")).thenReturn(new User("user", "password"));
-    UserModel userModel = externalUserStorageProvider.getUserByEmail( "user", mock(RealmModel.class));
+    when(userService.findByUsername(any())).thenReturn(UserValidationResponse.builder().username("username").build());
+    UserModel userModel = externalUserStorageProvider.getUserByEmail( "username", mock(RealmModel.class));
     assertThat(userModel).isNotNull();
-    assertThat(userModel.getUsername()).isEqualTo("user");
+    assertThat(userModel.getUsername()).isEqualTo("username");
   }
 }

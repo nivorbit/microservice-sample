@@ -1,6 +1,8 @@
 package com.nivorbit.keycloak.storage.provider;
 
-import com.nivorbit.keycloak.storage.model.User;
+import com.nivorbit.keycloak.storage.client.UserValidationClient;
+import com.nivorbit.keycloak.storage.client.UserValidationRequest;
+import com.nivorbit.keycloak.storage.client.UserValidationResponse;
 import com.nivorbit.keycloak.storage.service.PasswordVerify;
 import com.nivorbit.keycloak.storage.service.UserAdapter;
 import com.nivorbit.keycloak.storage.service.UserService;
@@ -24,10 +26,15 @@ import org.keycloak.storage.user.UserLookupProvider;
 public class ExternalUserStorageProvider
     implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
 
-  private final KeycloakSession keycloakSession;
-  private final ComponentModel componentModel;
+  private final KeycloakSession session;
+  private final ComponentModel model;
   private final UserService userService;
   private final PasswordVerify passwordVerify;
+
+  public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
+    this(session, model, new UserService(new UserValidationClient(session, model)),
+        new PasswordVerify());
+  }
 
   @Override
   public void close() {
@@ -64,26 +71,42 @@ public class ExternalUserStorageProvider
   }
 
   @Override
-  public boolean isValid(
-      RealmModel realmModel, UserModel userModel, CredentialInput credentialInput) {
+  public boolean isValid(RealmModel realmModel, UserModel userModel,
+                         CredentialInput credentialInput) {
     if (!supportsCredentialType(credentialInput.getType())
         || !(credentialInput instanceof UserCredentialModel)) {
       return false;
     }
 
-    User user = this.userService.findByUsername(StorageId.externalId(userModel.getId()));
-    if (Objects.isNull(user)) return false;
-
-    return passwordVerify.verify(credentialInput.getChallengeResponse(), user.getPassword());
+    passwordVerify.verify(credentialInput.getChallengeResponse());
+    return true;
   }
 
+
   private UserAdapter findByUsername(String username, RealmModel realmModel) {
-    User user = userService.findByUsername(username);
-    if (!Objects.isNull(user)) {
+    UserValidationResponse userValidationResponse =
+        userService.findByUsername(createUserValidationRequest(username));
+    if (!Objects.isNull(userValidationResponse) && !userValidationResponse.isHasError()) {
       return new UserAdapter(
-          keycloakSession, realmModel, componentModel, user);
+          session, realmModel, model, userValidationResponse);
     }
 
     return null;
+  }
+
+  private UserValidationRequest createUserValidationRequest(String username) {
+    var customerNumber =
+        this.session.getContext().getRequestHeaders().getHeaderString("X-CUSTOMER-NUMBER");
+    var corporate = this.session.getContext().getRequestHeaders().getHeaderString("X-CORPORATE");
+    var sessionId = this.session.getContext().getRequestHeaders().getHeaderString("X-SESSION-ID");
+    var password = this.session.getContext().getRequestHeaders().getHeaderString("X-PASSWORD");
+
+    return UserValidationRequest.builder()
+        .customerId(customerNumber)
+        .username(username)
+        .password(password)
+        .sessionId(sessionId)
+        .corporate(Boolean.parseBoolean(corporate))
+        .build();
   }
 }

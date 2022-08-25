@@ -2,42 +2,28 @@ package com.nivorbit.keycloak.storage.provider;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
-import io.restassured.response.Response;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 
 @Slf4j
 @Testcontainers
 class ExternalUserStorageProviderIT {
 
-  private static final String REALM = "inmemory";
+  private static final String REALM = "test";
 
   @Container
   private static final KeycloakContainer keycloak =
-      new KeycloakContainer()
-          .withRealmImportFile("/realm.json")
+      new KeycloakContainer("quay.io/keycloak/keycloak:19.0.1")
+          .withRealmImportFile("/test-realm.json")
           .withProviderClassesFrom("target/classes");
 
   @ParameterizedTest
@@ -57,58 +43,39 @@ class ExternalUserStorageProviderIT {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"user", "admin", "test"})
-  void testLoginAsUserAndCheckAccessToken(String username) throws IOException {
-    String accessTokenString =
-        requestToken(username, "test1234").then().statusCode(200).extract().path("access_token");
+  @CsvSource({"test,john,john", "test,admin,admin", "test,user,user"})
+  void testLoginAsUserAndCheckAccessToken(String realm, String username, String password) {
+    var authServerUrl = keycloak.getAuthServerUrl();
+    String accessToken = getAccessToken(realm, username, password);
 
-    ObjectMapper mapper = new ObjectMapper();
-    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {};
-
-    byte[] tokenPayload = Base64.getDecoder().decode(accessTokenString.split("\\.")[1]);
-    Map<String, Object> payload = mapper.readValue(tokenPayload, typeRef);
-
-    assertThat(payload.get("preferred_username"), is(username));
+    given().auth().oauth2(accessToken)
+        .when().get(authServerUrl + "realms/" + realm + "/protocol/openid-connect/userinfo")
+        .then()
+        .statusCode(200)
+        .body(allOf(
+            containsString("username"),
+            containsString(username)
+        ));
   }
 
-  @Test
-  void testLoginAsUserWithInvalidPassword() {
-    requestToken("test", "1234").then().statusCode(401);
-  }
-
-  @Test
-  void testAccessingUsersAsAdmin() {
-    Keycloak kcAdmin = keycloak.getKeycloakAdminClient();
-    UsersResource usersResource = kcAdmin.realm(REALM).users();
-    List<UserRepresentation> users = usersResource.search("user");
-    assertThat(users, is(not(empty())));
-
-    String userId = users.get(0).getId();
-    UserResource userResource = usersResource.get(userId);
-    assertThat(userResource.toRepresentation().getUsername(), is("user"));
-  }
-
-  private Response requestToken(String username, String password) {
-    String tokenEndpoint =
-        given()
-            .when()
-            .get(
-                keycloak.getAuthServerUrl()
-                    + "realms/"
-                    + REALM
-                    + "/.well-known/openid-configuration")
-            .then()
-            .statusCode(200)
-            .extract()
-            .path("token_endpoint");
+  private String getAccessToken(String realm, String username, String password) {
+    var authServerUrl = keycloak.getAuthServerUrl();
     return given()
         .contentType("application/x-www-form-urlencoded")
-        .formParam("username", username)
-        .formParam("password", password)
-        .formParam("grant_type", "password")
-        .formParam("client_id", KeycloakContainer.ADMIN_CLI_CLIENT)
-        .formParam("scope", "openid")
-        .when()
-        .post(tokenEndpoint);
+        .headers(Map.of(
+            "X-SESSION-ID", "1223",
+            "X-CUSTOMER-NUMBER", "1234",
+            "X-CORPORATE","true"
+        ))
+        .formParams(Map.of(
+            "username", username,
+            "password", password,
+            "grant_type", "password",
+            "client_id", "test-service",
+            "client_secret", "secret"
+        ))
+        .post(authServerUrl + "realms/" + realm + "/protocol/openid-connect/token")
+        .then().assertThat().statusCode(200)
+        .extract().path("access_token");
   }
 }
