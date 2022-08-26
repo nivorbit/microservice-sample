@@ -3,7 +3,7 @@ version: '3.9'
 services:
   auth-server:
     container_name: auth-server
-    image: nivorbit/services/keycloak-server:3.0.3
+    image: nivorbit/services/keycloak-server:1.0.0
     command: ["start-dev", "--proxy", "edge"]
     ports:
       - "8888:8080"

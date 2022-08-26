@@ -1542,7 +1542,7 @@
         "subComponents": {},
         "config": {
           "url": [
-            "http://host.docker.internal:9089"
+            "http://api:8080/custom-federation"
           ],
           "cachePolicy": [
             "DEFAULT"
